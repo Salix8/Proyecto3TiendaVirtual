@@ -6,8 +6,8 @@
     use ProyectoWeb\exceptions\QueryException;
     use ProyectoWeb\exceptions\NotFoundException;
     use ProyectoWeb\database\Connection;
-use ProyectoWeb\repository\CategoryRepository;
-use ProyectoWeb\repository\ProductRepository;
+    use ProyectoWeb\repository\CategoryRepository;
+    use ProyectoWeb\repository\ProductRepository;
 
     class ProductController {
 
@@ -23,6 +23,8 @@ use ProyectoWeb\repository\ProductRepository;
 
             $repositorio = new ProductRepository();
 
+            $repositorioCateg = new CategoryRepository();
+            $categorias = $repositorioCateg->findAll();
             try {
                 $producto = $repositorio->findById($id);
             } catch (NotFoundException $nfe) {
@@ -31,6 +33,6 @@ use ProyectoWeb\repository\ProductRepository;
             $title = $producto->getNombre();
             $relacionados = $repositorio->getRelacionados($producto->getId(), $producto->getIdCategoria());
 
-            return $this->container->renderer->render($response, "product.view.php", compact("title", "producto", "relacionados"));
+            return $this->container->renderer->render($response, "product.view.php", compact("title", "producto", "relacionados", "categorias"));
         }
     }

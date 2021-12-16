@@ -30,8 +30,16 @@ class ProductRepository extends QueryBuilder
         return $this->executeQuery($sql);
     }
 
-    public function getByCategory(int $id_categoria) {
+    public function getByCategory(int $id_categoria, int $itemsPerPage, int $currentPage){
         $sql = "SELECT * FROM $this->table WHERE id_categoria = $id_categoria";
+        $sql .= " LIMIT $itemsPerPage OFFSET " . $itemsPerPage * ($currentPage-1);
         return $this->executeQuery($sql);
+    }
+
+    public function getCountByCategory(int $id_categoria): int{
+        $sql = "SELECT count(*) as cuenta FROM $this->table WHERE id_categoria = $id_categoria";
+        $statement = $this->connection->prepare($sql);
+        $statement->execute();
+        return $statement->fetch(\PDO::FETCH_ASSOC)["cuenta"];
     }
 }
