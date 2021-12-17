@@ -48,6 +48,6 @@
             $productos = $repositorioProductos->getByCategory($categoriaActual->getId(), $itemsPerPage, $currentPage);
             $categorias = $repositorio->findAll();
     
-            return $this->container->renderer->render($response, "categoria.view.php", compact('title', 'categorias', 'categoriaActual', 'productos'));
+            return $this->container->renderer->render($response, "categoria.view.php", compact('title', 'categorias', 'categoriaActual', 'productos', 'paginator'));
         }
     }
