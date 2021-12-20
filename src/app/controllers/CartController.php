@@ -25,14 +25,16 @@ class CartController {
 
         extract($args);
         $title = " Carrito ";
+        $header = "Carro de la compra";
         $withCategories = false;
+        $checkout = false;
 
         //Obtener los productos del carro;
 
         $repositorio = new ProductRepository;
         $productos = $repositorio->getFromCart($this->container->cart);
 
-        return $this->container->renderer->render($response, "cart.view.php", compact('title', 'withCategories', 'productos', 'repositorio'));
+        return $this->container->renderer->render($response, "cart.view.php", compact('title', "header", "checkout", 'withCategories', 'productos', 'repositorio'));
     }
 
 
@@ -54,12 +56,105 @@ class CartController {
         return $response->withRedirect($this->container->router->pathFor('cart'), 303);
     }
 
+    public function addJSON($request, $response, $args) {
+
+        extract($args);
+
+        $quantity = 1; //Por add sólo añadimos 1 si no está ya en el carro
+        $repositorio = new ProductRepository;
+
+        try {
+            //Añadimos al carrito
+            $productoActual = $repositorio->findById($id);
+
+            if (!$this->container->cart->itemExists($id))
+                $this->container->cart->addItem($id, $quantity);
+
+        }catch(NotFoundException $nfe){
+           return json_encode([]);
+        }
+
+        //Obtenemos el total del carro
+        $productos = $repositorio->findAll();
+        $total = 0;
+
+        foreach ($productos as $producto){
+            $total += $this->container->cart->getItemCount($producto->getId()) * $producto->getPrecio();
+        }
+        
+        //Devolvemos los datos formateados como json
+        return json_encode(["producto" => $productoActual->toArray(),
+                            "itemCount" => $this->container->cart->getItemCount($id),
+                            "totalCarro" => number_format($total, 2, ",", "."),
+                            "rutaImagen" => \ProyectoWeb\entity\Product::RUTA_IMAGENES,
+                            "totalItems" => $this->container->cart->howMany($id)]);
+    }
+
+    public function update($request, $response, $args) {
+        extract($args);
+        $quantity ??= 1; // Por defecto es 1
+        $repositorio = new ProductRepository;
+    
+        try {
+            //Añadimos al carrito
+            $productoActual = $repositorio->findById($id);
+            $this->container->cart->addItem($id, $quantity);
+    
+        }catch(NotFoundException $nfe){
+            return json_encode([]);
+        }
+    
+        //Obtenemos el total del carro
+        $productos = $repositorio->findAll();
+        $total = 0;
+    
+        foreach ($productos as $producto){
+            $total += $this->container->cart->getItemCount($producto->getId()) * $producto->getPrecio();
+        }
+        
+        //Devolvemos los datos formateados como json
+        return json_encode(["totalCarro" => number_format($total, 2, ",", "."), ]);
+    }
+
     public function empty($request, $response, $args) {
 
         extract($args);
         $this->container['cart']->empty();
         
         return $response->withRedirect($this->container->router->pathFor('cart'), 303);
+    }
+
+    public function delete($request, $response, $args) {
+        extract($args);
+
+        $this->container['cart']->deleteItem($id);
+        return $response->withRedirect($this->container->router->pathFor('cart'), 303);
+    }
+
+    public function checkout($request, $response, $args) {
+        if (!isset($_SESSION["username"])) {
+            return $response->withRedirect($this->container->router->pathFor("login") . "?returnToUrl=" . $this->container->router->pathFor("cart-checkout"), 303);
+        }
+
+        extract($args);
+        $title = " Finalizar compra ";
+        $header = "Pago con PayPal";
+        $withCategories = false;
+        $checkout = true;
+        //Obtener los productos del carro
+        $repositorio = new ProductRepository;
+        $productos = $repositorio->getFromCart($this->container->cart);
+
+        return $this->container->renderer->render($response, "cart.view.php", compact("title", "header", "checkout", "withCategories", "productos"));
+    }
+
+    public function thankyou($request, $response, $args) {
+        $title =  "Gracias por su compra";
+        $withCategories = false;
+        $this->container["cart"]->empty();
+
+        return $this->container->renderer->render($response, "thankyou.view.php", compact("title", "withCategories"));
+        
     }
 
 }

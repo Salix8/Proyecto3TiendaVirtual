@@ -7,4 +7,8 @@
 
   include __DIR__ . "/partials/novedades.part.php";
 
+  include __DIR__ . "/partials/modal-carro.part.php";
+
+  include __DIR__ . "/partials/mask.part.php";
+
   include __DIR__ . "/partials/fin-doc.part.php";

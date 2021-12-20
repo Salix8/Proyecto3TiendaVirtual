@@ -41,6 +41,17 @@ $app->get('/cart', CartController::class . ':render')->setName("cart");
 $app->get('/cart/add/{id:[0-9]+}[/{quantity:[0-9]+}]', CartController::class . ':add')->setName("cart-add");
 
 $app->get('/cart/empty', CartController::class . ':empty')->setName("cart-empty");
+$app->get('/cart/dalete/{id:[0-9]+}', CartController::class . ':delete')->setName("cart-delete");
+
+$app->get('/cart/thankyou', CartController::class . ':thankyou')->setName("cart-thankyou");
+
+$app->get('/cart/checkout', CartController::class . ':checkout')->setName("cart-checkout");
+
+$app->get('/cart/add/json/{id:[0-9]+}[/{quantity:[0-9]+}]', CartController::class . ':addJSON')->setName("cart-add-json");
+
+$app->post('/cart/update/json/{id:[0-9]+}/[{quantity:[0-9]+}]', CartController::class . ':update')->setName("cart-update-json");
+
+
 
 
 $app->run();
