@@ -27,8 +27,8 @@
       <tr>
         <th scope="row"><?=$i++;?></th>
         <td><a href="<?=$router->pathFor('ficha', ['nombre' =>  ProyectoWeb\app\utils\Utils::encodeURI($producto->getNombre()), 'id' => $producto->getId()])?>"><?= $producto->getNombre()?></a></td>
-        <td><?= number_format($producto->getPrecio(), 2, ',', ' ')?> </td>
         <td><?= $cart->getCart()[$producto->getId()] ?></td>
+        <td><?= number_format($producto->getPrecio(), 2, ',', ' ')?> </td>
         <td><?=  number_format($cart->getCart()[$producto->getId()] * $producto->getPrecio(), 2, ',', ' '); ?> </td>
         <td><a href="<?=$router->pathFor('cart-delete', ['id' => $producto->getId()])?>" onclick="return confirmDeleteItem();"><span class='fa fa-close'></span></a></td>
       </tr>
